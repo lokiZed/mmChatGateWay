@@ -1,0 +1,73 @@
+/*
+
+除开 用户注册接口 用户登陆接口
+其余接口全部靠一个全局的websocket进行实现
+通过请求参数中的标识符来区分该次请求目的
+
+
+
+用户：
+1.用户注册接口(http)
+2.用户登陆接口(http)
+3.查询自身信息
+
+聊天
+1.查询当前已有聊天列表
+2.聊天详情页 查询聊天记录
+3.发送消息
+4.接收消息并更新
+
+联系人
+1.添加好友
+2.删除好友
+3.查询联系人列表
+*/
+type (
+	UserRegisterReq {
+		Avatar   string `json:"avatar"`
+		UserName string `json:"userName"`
+		UserPass string `json:"userPass"`
+		NickName string `json:"nickName"`
+		Gender   int64  `json:"gender,options=[1,2]"` // 1为男 2为女
+		Age      int64  `json:"age,range=(0:100)"`
+		DeviceId string `json:"deviceId"`
+	}
+	UserRegisterRes {
+		Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+	}
+)
+
+type (
+	UserLoginReq {
+		UserName string `json:"userName"`
+		UserPass string `json:"userPass"`
+	}
+	ResData {
+		Token string `json:"token"` // jwtToken
+	}
+	UserLoginRes {
+		Code int64   `json:"code"`
+		Msg  string  `json:"msg"`
+		Data ResData `json:"data"`
+	}
+)
+
+service mmChatGateWay {
+	@handler UserRegister
+	post /user/register (UserRegisterReq) returns (UserRegisterRes)
+
+	@handler UserLogin
+	post /user/login (UserLoginReq) returns (UserLoginRes)
+}
+
+@server (
+	jwt: JwtAuth
+)
+service mmChatGateWay {
+	@handler DoOperation
+	get /operation
+}
+
+type JwtAuth {}
+
