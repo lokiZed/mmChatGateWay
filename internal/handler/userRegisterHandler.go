@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
+	xhttp "github.com/zeromicro/x/http"
 	"mmChat/internal/logic"
 	"mmChat/internal/svc"
 	"mmChat/internal/types"
@@ -18,11 +19,7 @@ func UserRegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := logic.NewUserRegisterLogic(r.Context(), svcCtx)
-		resp, err := l.UserRegister(&req)
-		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
-		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
-		}
+		err := l.UserRegister(&req)
+		xhttp.JsonBaseResponseCtx(r.Context(), w, err)
 	}
 }

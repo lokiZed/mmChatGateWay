@@ -1,6 +1,7 @@
 package handler
 
 import (
+	xhttp "github.com/zeromicro/x/http"
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -20,9 +21,9 @@ func UserLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewUserLoginLogic(r.Context(), svcCtx)
 		resp, err := l.UserLogin(&req)
 		if err != nil {
-			httpx.ErrorCtx(r.Context(), w, err)
+			xhttp.JsonBaseResponseCtx(r.Context(), w, err)
 		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			xhttp.JsonBaseResponseCtx(r.Context(), w, resp)
 		}
 	}
 }

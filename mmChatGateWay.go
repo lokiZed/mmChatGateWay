@@ -3,10 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"mmChat/internal/rpcClient"
-
 	"mmChat/internal/config"
 	"mmChat/internal/handler"
+	"mmChat/internal/rpcClient"
 	"mmChat/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"

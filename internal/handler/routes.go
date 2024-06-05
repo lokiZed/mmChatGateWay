@@ -11,28 +11,34 @@ import (
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPost,
-				Path:    "/user/login",
-				Handler: UserLoginHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/user/register",
-				Handler: UserRegisterHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.IpCheck, serverCtx.RateLimitingControl},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/user/login",
+					Handler: UserLoginHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/user/register",
+					Handler: UserRegisterHandler(serverCtx),
+				},
+			}...,
+		),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/operation",
-				Handler: DoOperationHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.IpCheck, serverCtx.RateLimitingControl, serverCtx.JwtExpireCheck},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/operation",
+					Handler: DoOperationHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.JwtAuth.AccessSecret),
 	)
 }

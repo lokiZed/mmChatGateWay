@@ -4,19 +4,13 @@ package types
 type JwtAuth struct {
 }
 
-type ResData struct {
-	Token string `json:"token"` // jwtToken
-}
-
 type UserLoginReq struct {
 	UserName string `json:"userName"`
 	UserPass string `json:"userPass"`
 }
 
 type UserLoginRes struct {
-	Code int64   `json:"code"`
-	Msg  string  `json:"msg"`
-	Data ResData `json:"data"`
+	Token string `json:"token"` // jwtToken
 }
 
 type UserRegisterReq struct {
@@ -27,9 +21,4 @@ type UserRegisterReq struct {
 	Gender   int64  `json:"gender,options=[1,2]"` // 1为男 2为女
 	Age      int64  `json:"age,range=(0:100)"`
 	DeviceId string `json:"deviceId"`
-}
-
-type UserRegisterRes struct {
-	Code int64  `json:"code"`
-	Msg  string `json:"msg"`
 }

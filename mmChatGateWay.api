@@ -32,10 +32,6 @@ type (
 		Age      int64  `json:"age,range=(0:100)"`
 		DeviceId string `json:"deviceId"`
 	}
-	UserRegisterRes {
-		Code int64  `json:"code"`
-		Msg  string `json:"msg"`
-	}
 )
 
 type (
@@ -43,26 +39,25 @@ type (
 		UserName string `json:"userName"`
 		UserPass string `json:"userPass"`
 	}
-	ResData {
-		Token string `json:"token"` // jwtToken
-	}
 	UserLoginRes {
-		Code int64   `json:"code"`
-		Msg  string  `json:"msg"`
-		Data ResData `json:"data"`
+		Token string `json:"token"` // jwtToken
 	}
 )
 
+@server (
+	middleware: IpCheck,RateLimitingControl
+)
 service mmChatGateWay {
 	@handler UserRegister
-	post /user/register (UserRegisterReq) returns (UserRegisterRes)
+	post /user/register (UserRegisterReq)
 
 	@handler UserLogin
 	post /user/login (UserLoginReq) returns (UserLoginRes)
 }
 
 @server (
-	jwt: JwtAuth
+	jwt:        JwtAuth
+	middleware: IpCheck,RateLimitingControl,JwtExpireCheck
 )
 service mmChatGateWay {
 	@handler DoOperation

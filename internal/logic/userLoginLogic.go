@@ -2,6 +2,8 @@ package logic
 
 import (
 	"context"
+	"github.com/zeromicro/x/errors"
+	"mmChat/internal/define"
 	"mmChat/internal/rpcClient"
 	"mmChat/internal/rpcClient/pb/mmChatUserRpc"
 	"mmChat/internal/rpcClient/user"
@@ -26,8 +28,7 @@ func NewUserLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserLog
 	}
 }
 
-func (l *UserLoginLogic) UserLogin(req *types.UserLoginReq) (resp *types.UserLoginRes, err error) {
-	// todo: add your logic here and delete this line
+func (l *UserLoginLogic) UserLogin(req *types.UserLoginReq) (*types.UserLoginRes, error) {
 	rpcUser := user.NewUser(rpcClient.GetRpcClient())
 	rpcReq := &mmChatUserRpc.UserLoginReq{
 		UserName: req.UserName,
@@ -35,15 +36,15 @@ func (l *UserLoginLogic) UserLogin(req *types.UserLoginReq) (resp *types.UserLog
 	}
 	rpcRes, err := rpcUser.UserLogin(l.ctx, rpcReq)
 	if err != nil {
-		return nil, err
+		l.Errorw("userLoginRpc", logx.Field("err", err.Error()))
+		return nil, errors.New(define.ResponseCodePanic, "登陆失败")
 	}
-
-	resp = &types.UserLoginRes{
-		Code: rpcRes.Code,
-		Msg:  rpcRes.Msg,
-		Data: types.ResData{
-			Token: rpcRes.Data.GetToken(),
-		},
+	if rpcRes.Msg != "" {
+		l.Infow("userLoginRpc", logx.Field("msg", rpcRes.Msg))
+		return nil, errors.New(define.ResponseCodeBusError, rpcRes.Msg)
 	}
-	return resp, nil
+	out := &types.UserLoginRes{
+		Token: rpcRes.Data.Token,
+	}
+	return out, nil
 }
